@@ -1,44 +1,260 @@
-<section class="py-20 px-10 max-w-6xl mx-auto text-center">
-        <h2 class="text-3xl font-bold mb-4 text-[#0A2540]">Analisis Likuiditas: Simpan Modal Anda</h2>
-        <p class="text-slate-600 mb-12 max-w-2xl mx-auto">Lihat bagaimana skema sewa menjaga posisi kas perusahaan Anda tetap aman dibandingkan investasi konvensional.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WTP Executive Dashboard - Filtered Water</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #020617; font-family: 'Inter', sans-serif; color: #f8fafc; overflow-x: hidden; margin: 0; padding: 20px; }
+        .font-mono { font-family: 'IBM Plex Mono', monospace; }
         
-        <div class="grid md:grid-cols-2 gap-8 items-center bg-slate-50 p-8 rounded-3xl border border-slate-200">
-            <div class="p-6 bg-white rounded-xl shadow-inner h-80 flex flex-col justify-between">
-                <div class="flex items-end h-48 gap-6 border-l-2 border-b-2 border-slate-200 p-2 relative">
-                    <div class="flex-1 bg-slate-200 rounded-t-md relative group transition-all hover:bg-red-400">
-                        <div class="h-full w-full"></div>
-                        <span class="absolute -top-10 left-0 right-0 text-red-600 font-bold text-sm">Rp 300M+</span>
-                        <p class="absolute -bottom-8 left-0 right-0 text-[10px] uppercase font-bold text-slate-400">Bangun Sendiri</p>
-                    </div>
-                    <div class="flex-1 bg-emerald-500 rounded-t-md relative group">
-                        <div class="h-[10%] w-full"></div>
-                        <span class="absolute -top-10 left-0 right-0 text-emerald-600 font-bold text-sm">Rp 0 (Capex)</span>
-                        <p class="absolute -bottom-8 left-0 right-0 text-[10px] uppercase font-bold text-emerald-600">Sewa Invila™</p>
-                    </div>
+        .panel { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .kpi-card { background: linear-gradient(145deg, #020617, #0f172a); border: 1px solid #1e293b; border-radius: 8px; padding: 20px; position: relative; overflow: hidden; }
+        
+        /* Subtle Glow Effects */
+        .kpi-glow-blue { position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(6, 182, 212, 0.15); filter: blur(30px); border-radius: 50%; pointer-events: none;}
+        .kpi-glow-orange { position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(249, 115, 22, 0.15); filter: blur(30px); border-radius: 50%; pointer-events: none;}
+        .kpi-glow-emerald { position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(16, 185, 129, 0.15); filter: blur(30px); border-radius: 50%; pointer-events: none;}
+
+        .status-dot { width: 10px; height: 10px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 10px #22c55e; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        
+        .header-line { border-bottom: 2px solid #1e293b; margin-bottom: 20px; padding-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="max-w-[1500px] mx-auto panel p-6">
+        
+        <!-- HEADER -->
+        <div class="flex justify-between items-center header-line">
+            <div>
+                <!-- PERUBAHAN JUDUL DENGAN SIMBOL TRADEMARK -->
+                <h1 class="text-2xl font-extrabold tracking-wide text-slate-200">Invila&trade; OUTLET TELEMETRY DASHBOARD</h1>
+                <p class="text-slate-500 font-mono text-xs mt-1">ZLD ENTERPRISE NODE: FILTERED WATER (FIT-01, AIT-02, & LIT)</p>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="text-right">
+                    <div class="text-slate-400 font-mono text-xs">SYSTEM TIME</div>
+                    <div class="text-slate-200 font-mono font-bold text-sm" id="sysTime">00:00:00</div>
                 </div>
-                <p class="text-[11px] text-slate-400 mt-10 italic">*Estimasi perbandingan pengeluaran modal di Tahun ke-0</p>
+                <div class="flex items-center gap-2 bg-slate-900 border border-slate-700 px-4 py-2 rounded-md shadow-inner">
+                    <div class="status-dot"></div>
+                    <span class="text-green-500 font-bold font-mono text-xs tracking-widest">DATA LINK ACQUIRED</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI CARDS (Top Level Insight) -->
+        <!-- DIUBAH MENJADI 5 KOLOM (grid-cols-5) -->
+        <div class="grid grid-cols-5 gap-6 mb-6">
+            
+            <!-- KPI 1: Real-time Debit (FIT) -->
+            <div class="kpi-card border-l-4 border-l-cyan-500">
+                <div class="kpi-glow-blue"></div>
+                <div class="text-slate-400 text-[10px] font-bold tracking-widest mb-1 font-mono">REAL-TIME FLOW (FIT)</div>
+                <div class="flex items-end gap-2">
+                    <span class="text-4xl font-black text-white font-mono tracking-tight" id="valFlow">27.0</span>
+                    <span class="text-cyan-500 font-bold mb-1">m³/h</span>
+                </div>
+                <div class="text-[10px] text-slate-500 mt-2 font-mono">Setpoint: 7.5 Lps</div>
             </div>
 
-            <div class="text-left space-y-6">
-                <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-emerald-500">
-                    <h4 class="font-bold text-[#0A2540]">Efisiensi Cashflow 100%</h4>
-                    <p class="text-sm text-slate-600">Alihkan dana Rp300 Miliar Anda untuk marketing kawasan atau akuisisi lahan baru.</p>
+            <!-- KPI 2: Real-time Turbidity (AIT2) -->
+            <div class="kpi-card border-l-4 border-l-orange-500">
+                <div class="kpi-glow-orange"></div>
+                <div class="text-slate-400 text-[10px] font-bold tracking-widest mb-1 font-mono">TURBIDITY (AIT-02)</div>
+                <div class="flex items-end gap-2">
+                    <span class="text-4xl font-black text-white font-mono tracking-tight" id="valTurb">0.85</span>
+                    <span class="text-orange-500 font-bold mb-1">NTU</span>
                 </div>
-                <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-emerald-500">
-                    <h4 class="font-bold text-[#0A2540]">Pay-As-You-Go</h4>
-                    <p class="text-sm text-slate-600">Biaya operasional bulanan tertutup langsung dari pendapatan tarif air tenant.</p>
-                </div>
-                <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
-                    <h4 class="font-bold text-[#0A2540]">Tax Efficiency</h4>
-                    <p class="text-sm text-slate-600">Biaya sewa dapat dikategorikan sebagai biaya operasional (OPEX) yang mengurangi beban pajak pendapatan.</p>
-                </div>
+                <div class="text-[10px] text-slate-500 mt-2 font-mono">Standard: < 2.0 NTU</div>
             </div>
+
+            <!-- KPI 3: Stock Reservoir Volume (LIT) -->
+            <div class="kpi-card border-l-4 border-l-emerald-500">
+                <div class="kpi-glow-emerald"></div>
+                <div class="text-slate-400 text-[10px] font-bold tracking-widest mb-1 font-mono">RESERVOIR STOCK (LIT)</div>
+                <div class="flex items-end gap-2">
+                    <span class="text-4xl font-black text-white font-mono tracking-tight" id="valReservoir">142.5</span>
+                    <span class="text-emerald-500 font-bold mb-1">m³</span>
+                </div>
+                <div class="text-[10px] text-emerald-400 mt-2 font-mono font-bold">Max Capacity: 500 m³</div>
+            </div>
+
+            <!-- KPI 4: Today's Production -->
+            <div class="kpi-card border-l-4 border-l-blue-600">
+                <div class="text-slate-400 text-[10px] font-bold tracking-widest mb-1 font-mono">TODAY'S PROD. VOL</div>
+                <div class="flex items-end gap-2">
+                    <span class="text-4xl font-black text-white font-mono tracking-tight" id="valToday">324.5</span>
+                    <span class="text-blue-500 font-bold mb-1">m³</span>
+                </div>
+                <div class="text-[10px] text-green-400 mt-2 font-mono font-bold">▲ +12% from yesterday</div>
+            </div>
+
+            <!-- KPI 5: Monthly Accumulation -->
+            <div class="kpi-card border-l-4 border-l-indigo-600">
+                <div class="text-slate-400 text-[10px] font-bold tracking-widest mb-1 font-mono">MONTHLY ACCUM.</div>
+                <div class="flex items-end gap-2">
+                    <span class="text-4xl font-black text-white font-mono tracking-tight" id="valMonth">4,850</span>
+                    <span class="text-indigo-400 font-bold mb-1">m³</span>
+                </div>
+                <div class="text-[10px] text-slate-500 mt-2 font-mono">Target: 18,000 m³ / Mo</div>
+            </div>
+
         </div>
+
+        <!-- MAIN CHART CONTAINER -->
+        <div class="bg-[#020617] border border-slate-800 rounded-lg p-4 shadow-inner relative h-[400px]">
+            <div class="absolute top-4 left-6 z-10 flex gap-6">
+                <div class="flex items-center gap-2"><div class="w-3 h-3 bg-cyan-500 rounded-sm"></div><span class="text-xs text-slate-300 font-mono font-bold">FLOW RATE (m³/h)</span></div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 bg-orange-500 rounded-sm"></div><span class="text-xs text-slate-300 font-mono font-bold">TURBIDITY (NTU)</span></div>
+            </div>
+            <!-- Canvas for Chart.js -->
+            <canvas id="trendChart"></canvas>
+        </div>
+
+    </div>
+
+<script>
+    // --- 1. CLOCK ---
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('sysTime').innerText = now.toLocaleTimeString('en-US', { hour12: false });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // --- 2. CHART.JS INITIALIZATION (McKinsey Style) ---
+    const ctx = document.getElementById('trendChart').getContext('2d');
+    
+    // Gradient for Flow (Area fill)
+    let flowGradient = ctx.createLinearGradient(0, 0, 0, 400);
+    flowGradient.addColorStop(0, 'rgba(6, 182, 212, 0.4)');
+    flowGradient.addColorStop(1, 'rgba(6, 182, 212, 0.0)');
+
+    // Gradient for Turbidity (Area fill)
+    let turbGradient = ctx.createLinearGradient(0, 0, 0, 400);
+    turbGradient.addColorStop(0, 'rgba(249, 115, 22, 0.2)');
+    turbGradient.addColorStop(1, 'rgba(249, 115, 22, 0.0)');
+
+    const maxDataPoints = 60; // Show last 60 seconds
+    const timeLabels = Array.from({length: maxDataPoints}, (_, i) => '');
+    const flowData = Array.from({length: maxDataPoints}, () => 27);
+    const turbData = Array.from({length: maxDataPoints}, () => 0.8);
+
+    const trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timeLabels,
+            datasets: [
+                {
+                    label: 'Flow Rate (m³/h)',
+                    data: flowData,
+                    borderColor: '#06b6d4',
+                    backgroundColor: flowGradient,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: true,
+                    tension: 0.4,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Turbidity (NTU)',
+                    data: turbData,
+                    borderColor: '#f97316',
+                    backgroundColor: turbGradient,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: true,
+                    tension: 0.4,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false, // Turn off global animation for smooth real-time roll
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: { 
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)', 
+                    titleFont: { family: 'IBM Plex Mono' },
+                    bodyFont: { family: 'IBM Plex Mono' },
+                    borderColor: '#334155', borderWidth: 1
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(51, 65, 85, 0.3)', drawBorder: false },
+                    ticks: { display: false }
+                },
+                y: {
+                    type: 'linear', display: true, position: 'left',
+                    min: 0, max: 40,
+                    grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                    ticks: { color: '#94a3b8', font: { family: 'IBM Plex Mono', size: 10 } },
+                    title: { display: true, text: 'm³/h', color: '#06b6d4', font: { family: 'IBM Plex Mono', size: 10 } }
+                },
+                y1: {
+                    type: 'linear', display: true, position: 'right',
+                    min: 0, max: 3,
+                    grid: { drawOnChartArea: false },
+                    ticks: { color: '#94a3b8', font: { family: 'IBM Plex Mono', size: 10 } },
+                    title: { display: true, text: 'NTU', color: '#f97316', font: { family: 'IBM Plex Mono', size: 10 } }
+                }
+            }
+        }
+    });
+
+    // --- 3. REAL-TIME DATA SIMULATION LOGIC ---
+    let totalToday = 324.5;
+    let totalMonth = 4850.0;
+    let reservoirVolume = 142.5; // Stok awal Reservoir
+    
+    function updateData() {
+        // Base Flow: 7.5 Lps = 27 m3/h. Add +/- 0.5 noise
+        let currentFlow = 27.0 + (Math.random() * 1.0 - 0.5); 
         
-        <div class="mt-12">
-            <a href="https://wa.me/+6285890135859?text=Halo%20Pieter,%20saya%20tertarik%20melihat%20simulasi%20NPV%20untuk%20kapasitas%20kami." class="inline-flex items-center gap-3 bg-[#0A2540] text-white px-8 py-4 rounded-full font-bold hover:bg-slate-800 transition shadow-xl">
-                <i class="fa-solid fa-file-invoice-dollar text-xl text-emerald-400"></i>
-                Dapatkan Simulasi Custom Untuk Kawasan Anda
-            </a>
-        </div>
-    </section>
+        // Base Turbidity: 0.8 NTU. Add +/- 0.05 noise
+        let currentTurb = 0.8 + (Math.random() * 0.1 - 0.05);
+        
+        // Update Chart Arrays
+        flowData.push(currentFlow); flowData.shift();
+        turbData.push(currentTurb); turbData.shift();
+        trendChart.update();
+
+        // Update Text FIT & AIT2
+        document.getElementById('valFlow').innerText = currentFlow.toFixed(1);
+        document.getElementById('valTurb').innerText = currentTurb.toFixed(2);
+
+        // Accumulate Volume in
+        let volInPerSecond = currentFlow / 3600;
+        totalToday += volInPerSecond;
+        totalMonth += volInPerSecond;
+
+        // Distribusi keluar pabrik (Asumsi sekitar 26.5 m3/h keluar dari Reservoir)
+        let distributionOut = (26.5 + (Math.random() * 1.0 - 0.5)) / 3600;
+        reservoirVolume += (volInPerSecond - distributionOut);
+
+        // Limit reservoir capacity (0 to 500 m3)
+        if(reservoirVolume > 500) reservoirVolume = 500;
+        if(reservoirVolume < 0) reservoirVolume = 0;
+
+        // Update Text Volume Reservoir & Accumulation
+        document.getElementById('valReservoir').innerText = reservoirVolume.toFixed(1);
+        document.getElementById('valToday').innerText = totalToday.toFixed(1);
+        document.getElementById('valMonth').innerText = Math.floor(totalMonth).toLocaleString();
+    }
+
+    // Run data update every 1 second
+    setInterval(updateData, 1000);
+
+</script>
+</body>
+</html>
